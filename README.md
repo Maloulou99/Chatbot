@@ -1,22 +1,27 @@
-Recipe Finder
+# Recipe Finder
+
 Welcome to Recipe Finder, your personal assistant for finding recipes based on the ingredients you have on hand.
 
-Introduction
+## Introduction
+
 Recipe Finder is a Python-based application that allows you to input the ingredients you currently have and receive recipe recommendations accordingly. It uses natural language processing (NLP) techniques to understand your input and match it with a database of recipes.
 
-Installation
+### Clone the repository
 Clone the repository to your local machine:
 git clone <repository_url>
 
-Install the required Python libraries:
-
+### Install the required Python libraries
 pip install -r requirements.txt
 Make sure you have the necessary NLTK data downloaded. You can download it using the following commands:
 
+
+### Download NLTK data
+Make sure you have the necessary NLTK data downloaded. You can download it using the following commands:
+```bash
 python -m nltk.downloader punkt
 python -m nltk.downloader stopwords
 python -m nltk.downloader wordnet
-Usage
+
 Run the recipe_finder.py script:
 
 python recipe_finder.py
