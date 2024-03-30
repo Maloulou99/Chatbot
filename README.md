@@ -1,5 +1,5 @@
 # Chatbot - DishDive
-Hello and welcome to the Chatbot "Recipe Finder". The Chatbot can help you to find the perfect recipe for you!
+Hello and welcome to the Chatbot "DishDive". The Chatbot can help you to find the perfect recipe for you!
 The search is based on your ingredients and preferences.
 
 ## Introduction
