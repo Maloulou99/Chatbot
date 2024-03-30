@@ -3,7 +3,7 @@ Hello and welcome to the Chatbot "Recipe Finder". The Chatbot can help you to fi
 The search is based on your ingredients and preferences.
 
 ## Introduction
-The chatbot is implemented in Python. Users can enter their ingredients and preferences using the input function, and the chatbot provides recipe recommendations tailored to their input. Natural language processing (NLP) techniques are used by the chatbot to accurately process user input.
+The Chatbot is implemented in Python. Users can enter their ingredients and preferences using the input function, and the Chatbot provides recipe recommendations tailored to their input. Natural language processing (NLP) techniques are used by the chatbot to accurately process user input.
 
 ### Clone the repository
 Clone the repository to your local machine:
@@ -11,21 +11,20 @@ Clone the repository to your local machine:
 2. Navigate to the folder where you want to put the project files.
 3. Use: 
 ```bash
-git clone <repository_url> 
+git clone https://github.com/Maloulou99/Chatbot.git
 ```
-Replace <repository_url> with the URL of the repository you want to clone. You can find this URL on the repository's GitHub page under the "Clone or download" button. 
 
 4. Press Enter to run the command.
 5. Wait for GitHub to clone the repository to your local machine. And now you should have a local copy of the project files ready to use.
 
-### Install the required Python libraries
-The following cell contains the Python libraries needed to work with the chatbot. They need to be installed in the running environment with e.g:
+## Installation
+The following cell contains the Python libraries needed to work with the Chatbot. They need to be installed in the running environment with e.g:
 
 ```bash
 pip install pandas
 ```
 
-```bash
+```python
 import pandas as pd
 import string
 import nltk
@@ -42,18 +41,31 @@ python -m nltk.downloader stopwords
 python -m nltk.downloader wordnet
 ```
 
-Run the recipe_finder.py script:
-
-python recipe_finder.py
-Follow the prompts to input the ingredients you have. Type exit when you're finished.
-
-Recipe Finder will process your input and provide you with a recipe recommendation based on the ingredients you have.
+## Usage 
+To use the "Recipe Finder" Chatbot correct, follow these steps: 
+1. Run the chatbot.py script:
+```bash
+python chatbot.py
+```
+2. Follow the Chatbots prompt and add your ingredients and preferences.
+3. Recipe Finder will process the information you have entered and provide you with a recipe recommendation based on the ingredients you have available. 
+4. Type exit when you're finished. This will signal to the chatbot that you have received a recipe that suits you.
 
 ## Data
-Recipe Finder uses a CSV file containing recipes and their ingredients. You can replace the name_your_csv file in the repository with your own CSV file containing recipes.
+Recipe Finder uses a CSV file of recipes and their ingredients. 
+
+If you'd like to replace the CSV file in the repository with your own CSV file of recipes. 
+Navigate to line 82 of the chatbot.py script: 
+```python
+#DataCSV file
+df = pd.read_csv('name_your_csv')
+```
+Replace 'name_your_csv' with the filename of your custom CSV file. Ensure that your CSV file follows the same format as the example provided.
 
 ## Contributing
-If you'd like to contribute to Recipe Finder, feel free to fork the repository and submit a pull request with your changes.
+If you'd like to contribute to Recipe Finder, feel free to the repository and submit a pull request with your changes.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+[MIT](https://choosealicense.com/licenses/mit/)
