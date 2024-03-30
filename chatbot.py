@@ -3,7 +3,7 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import LancasterStemmer, WordNetLemmatizer
-import seaborn as sns
+#import seaborn as sns
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -80,8 +80,9 @@ spices_keywords = ['Salt', 'Pepper', 'Oregano', 'Basil', 'Thyme', 'Rosemary', 'P
                    'Fennel', 'Bay leaf', 'Saffron', 'Vanilla bean', 'Allspice']
 
 #DataCSV file
-df = pd.read_csv('name_your_csv')
+df = pd.read_csv('recipies.csv')
 data = df.to_dict(orient='records')
+#print(data)
 #Print the data out from the index
 data[0] 
 
@@ -138,7 +139,7 @@ def find_keywords(tokens, keywords):
 # Seperate the words
 def toktok_tokenize_recipe(data):
     toktok = nltk.ToktokTokenizer()
-    toktok_tokens = [toktok.tokenize(recipe['recipe']) for recipe in data]
+    toktok_tokens = [toktok.tokenize(recipe['Step list']) for recipe in data]
     return toktok_tokens
 
 # Count matched words
