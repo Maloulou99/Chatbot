@@ -74,10 +74,10 @@ sour_keywords = ['Lemon', 'Lime', 'Vinegar', 'Yogurt', 'Sour cream', 'Buttermilk
                  'Sour papaya', 'Sour pineapple', 'Sour strawberry', 'Sour banana', 'Sour pear']
 
 # Spices
-spices_keywords = ['Salt', 'Pepper', 'Oregano', 'Basil', 'Thyme', 'Rosemary', 'Paprika', 'Curry', 'Cumin', 
-                   'Cinnamon', 'Garlic', 'Onion', 'Coriander', 'Turmeric', 'Mustard', 'Ginger', 
-                   'Nutmeg', 'Thyme', 'Anise', 'Dill', 'Sesame', 'Chili', 'Cardamom', 'Cloves', 
-                   'Fennel', 'Bay leaf', 'Saffron', 'Vanilla bean', 'Allspice']
+spices_keywords = ['Black pepper', 'Cayenne pepper', 'Chili powder', 'Cumin', 'Curry powder', 
+                   'Paprika', 'Red pepper flakes', 'Wasabi', 'Ginger', 'Mustard powder', 
+                   'Horseradish', 'Szechuan pepper', 'Jalapeno', 'Tabasco', 'Harissa', 
+                   'Sriracha', 'Habanero', 'Chipotle', 'Ghost pepper', 'Scotch bonnet']
 
 #DataCSV file
 df = pd.read_csv('name_your_csv')
