@@ -79,15 +79,29 @@ spices_keywords = ['Black pepper', 'Cayenne pepper', 'Chili powder', 'Cumin', 'C
                    'Horseradish', 'Szechuan pepper', 'Jalapeno', 'Tabasco', 'Harissa', 
                    'Sriracha', 'Habanero', 'Chipotle', 'Ghost pepper', 'Scotch bonnet']
 
-#DataCSV file
-df = pd.read_csv('recipies.csv')
-data = df.to_dict(orient='records')
-#print(data)
-#Print the data out from the index
-data[0] 
+def keywords(user_input):
+    if user_input in ["meat", "fish"]:
+        return meat_fish_keywords
+    elif user_input == "grains":
+        return grains_keywords
+    elif user_input == "dairy":
+        return dairy_keywords
+    elif user_input in ["fruits", "vegetables"]:
+        return fruits_vegetables_keywords
+    elif user_input == "baking":
+        return baking_keywords
+    elif user_input == "beverages":
+        return beverages_keywords
+    elif user_input == "sweet":
+        return sweet_keywords
+    elif user_input == "sour":
+        return sour_keywords
+    elif user_input == "spices":
+        return spices_keywords
+    else:
+        return None
 
-#How many Index positions do we have in the CSV 
-len(data)
+
 
 #Seperate the words in a setting
 def toktok_tokenize(data):
@@ -175,31 +189,44 @@ def chat():
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
             break
     
+    # Get keywords based on user input
+        category_keywords = keywords(user_input)
+        if category_keywords is None:
+            print("I'm sorry, I didn't understand that ingredient. Please try again.")
+            continue
+
+        print(f"The keywords for the '{user_input}' category are: {', '.join(category_keywords)}")
+
         processed_input = preprocess_input(user_input)
-        toktok_tokenize(processed_input)
+        toktok_tokenize(processed_input)        
+        filter_for_stop_words(processed_input)
+        stem(processed_input)
+        lemmatize(processed_input)
+        post_tagging(processed_input)
 
-        matched_keywords = find_keywords(processed_input, 
-                                         meat_fish_keywords + grains_keywords + dairy_keywords + 
-                                         fruits_vegetables_keywords + baking_keywords + beverages_keywords + 
-                                         sweet_keywords + sour_keywords + spices_keywords)
-        
-        filter_for_stop_words(matched_keywords)
-        stem(matched_keywords)
-        lemmatize(matched_keywords)
-        post_tagging(matched_keywords)
+        #DataCSV file
+        df = pd.read_csv('recipies.csv')
+        data = df.to_dict(orient='records')
+        #print(data)
+        #Print the data out from the index
+        #data[0] 
 
-        if matched_keywords:
-            print("You mentioned:", ", ".join(matched_keywords))
+        #How many Index positions do we have in the CSV 
+        #len(data)
 
+        if processed_input:
+            print("You mentioned:", ", ".join(processed_input))
+
+            # Tokenize recipes
             toktok_tokens = toktok_tokenize_recipe(data)
 
-            matched_word_counts = [count_matched_words(toktok_tokens, matched_keywords)]
+            # Count matched words
+            matched_word_counts = [count_matched_words(toktok_tokens, category_keywords)]
 
+            # Find recipe with maximum matched words
             max_matched_recipe_index = max(range(len(matched_word_counts)), key=lambda i: sum(matched_word_counts[i].values()))
 
             print("Based on your ingredients, here's a recipe recommendation:")
             print(data[max_matched_recipe_index]['recipe'])
-        else:
-            print("I'm sorry, I didn't understand. Can you please specify some ingredients?")
-
 chat()
+
