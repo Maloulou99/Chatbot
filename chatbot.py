@@ -79,38 +79,40 @@ spices_keywords = ['Black pepper', 'Cayenne pepper', 'Chili powder', 'Cumin', 'C
                    'Horseradish', 'Szechuan pepper', 'Jalapeno', 'Tabasco', 'Harissa', 
                    'Sriracha', 'Habanero', 'Chipotle', 'Ghost pepper', 'Scotch bonnet']
 
-def keywords(user_input):
-    if user_input in meat_fish_keywords:
-        return "meaty dish"
-    elif user_input == "grains":
-        return grains_keywords
-    elif user_input == "dairy":
-        return dairy_keywords
-    elif user_input in ["fruits", "vegetables"]:
-        return fruits_vegetables_keywords
-    elif user_input == "baking":
-        return baking_keywords
-    elif user_input == "beverages":
-        return beverages_keywords
-    elif user_input == "sweet":
-        return sweet_keywords
-    elif user_input == "sour":
-        return sour_keywords
-    elif user_input == "spices":
-        return spices_keywords
-    else:
-        return None
 
+def find_keyword_list(user_input):
+    user_input = user_input.lower()
+    matching_lists = []
 
+    if "meat" in user_input:
+        matching_lists.extend(meat_fish_keywords)
+    if "grains" in user_input:
+        matching_lists.extend(grains_keywords)
+    if "dairy" in user_input:
+        matching_lists.extend(dairy_keywords)
+    if any(word in user_input for word in ["fruits", "vegetables"]):
+        matching_lists.extend(fruits_vegetables_keywords)
+    if "baking" in user_input:
+        matching_lists.extend(baking_keywords)
+    if "beverages" in user_input:
+        matching_lists.extend(beverages_keywords)
+    if "sweet" in user_input:
+        matching_lists.extend(sweet_keywords)
+    if "sour" in user_input:
+        matching_lists.extend(sour_keywords)
+    if "spices" in user_input:
+        matching_lists.extend(spices_keywords)
+
+    return matching_lists if matching_lists else None
 
 #Seperate the words in a setting
-def toktok_tokenize(data):
+""" def toktok_tokenize(data):
     toktok = nltk.ToktokTokenizer()
     toktok.tokenize
     toktok = [token for token in toktok if token not in string.punctuation]
     #data = data.translate(str.maketrans('', '', string.punctuation))
     #toktok = toktok.tokenize(data)
-    return toktok
+    return toktok """
 
 #Recognize the shortcuts of a word
 def stem(tokens):
@@ -168,13 +170,6 @@ def count_matched_words(tokens, keywords):
                 count[word.capitalize()] += 1
     return count
 
-# Process user input and find matched keywords
-def preprocess_input(text):
-    tokens = nltk.word_tokenize(text)
-    tokens = [token for token in tokens if token not in string.punctuation]
-    tokens = [token for token in tokens if token.lower() not in stop_words]
-    return tokens
-
 def find_keywords(tokens, keywords):
     matched_keywords = [token for token in tokens if token.capitalize() in keywords]
     return matched_keywords
@@ -189,8 +184,21 @@ def chat():
 
     while True:
         user_input = input("You: ").lower() 
+        
+       
         processed_input = preprocess_input(user_input)
-        #toktok_tokenize(processed_input)        
+        #toktok_tokenize(processed_input)
+        
+        user_input = input("Enter keywords: ")
+        keyword_list = find_keyword_list(user_input)
+
+        if keyword_list:
+            print("Matching keywords:")
+            for keyword in keyword_list:
+                print(keyword)
+        else:
+            print("No matching keyword list found for the input.")
+
         filter_for_stop_words(processed_input, stop_words)
         stem(processed_input)
         lemmatize(processed_input)
