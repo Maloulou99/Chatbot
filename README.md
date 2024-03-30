@@ -49,7 +49,7 @@ python chatbot.py
 ```
 2. Follow the Chatbots prompt and add your ingredients and preferences.
 3. Recipe Finder will process the information you have entered and provide you with a recipe recommendation based on the ingredients you have available. 
-4. Type exit when you're finished. This will signal to the chatbot that you have received a recipe that suits you.
+4. Type exit when you're finished. This will signal to the Chatbot that you have received a recipe that suits you.
 
 ## Data
 Recipe Finder uses a CSV file of recipes and their ingredients. 
