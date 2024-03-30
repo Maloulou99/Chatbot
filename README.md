@@ -1,45 +1,71 @@
-# Recipe Finder
-
-Welcome to Chatbot there can help you to find the perfect Recipe for you!
-Your personal assistant for finding recipes based on the ingredients you have on hand and you preferences.
+# Chatbot - DishDive
+Hello and welcome to the Chatbot "DishDive". The Chatbot can help you to find the perfect recipe for you!
+The search is based on your ingredients and preferences.
 
 ## Introduction
-
-Chatbot is a Python-based application that allows you to input your questions for what ingredients you currently have and receive recipe recommendations accordingly. It uses natural language processing (NLP) techniques to understand your input and match it with a database of recipes.
+The Chatbot is implemented in Python. Users can enter their ingredients and preferences using the input function, and the Chatbot provides recipe recommendations tailored to their input. Natural language processing (NLP) techniques are used by the chatbot to accurately process user input.
 
 ### Clone the repository
 Clone the repository to your local machine:
-``bash
-git clone <repository_url>
+1. Open your terminal prompt
+2. Navigate to the folder where you want to put the project files.
+3. Use: 
+```bash
+git clone https://github.com/Maloulou99/Chatbot.git
+```
 
-### Install the required Python libraries
+4. Press Enter to run the command.
+5. Wait for GitHub to clone the repository to your local machine. And now you should have a local copy of the project files ready to use.
 
-``bash
-pip install -r requirements.txt
+## Installation
+The following cell contains the Python libraries needed to work with the Chatbot. They need to be installed in the running environment with e.g:
 
-Make sure you have the necessary NLTK data downloaded. You can download it using the following commands:
+```bash
+pip install pandas
+```
 
+```python
+import pandas as pd
+import string
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import LancasterStemmer, WordNetLemmatizer
+```
 
-### Download NLTK data
-Make sure you have the necessary NLTK data downloaded. You can download it using the following commands:
+#### Download NLTK data
+Also make sure you have downloaded the necessary NLTK data. You can download it using the following commands:
 
 ```bash
 python -m nltk.downloader punkt
 python -m nltk.downloader stopwords
 python -m nltk.downloader wordnet
+```
 
-Run the recipe_finder.py script:
+## Usage 
+To use the "DishDive" Chatbot correct, follow these steps: 
+1. Run the chatbot.py script:
+```bash
+python chatbot.py
+```
+2. Follow the Chatbots prompt and add your ingredients and preferences.
+3. Recipe Finder will process the information you have entered and provide you with a recipe recommendation based on the ingredients you have available. 
+4. Type exit when you're finished. This will signal to the Chatbot that you have received a recipe that suits you.
 
-python recipe_finder.py
-Follow the prompts to input the ingredients you have. Type exit when you're finished.
+## Data
+Recipe Finder uses a CSV file of recipes and their ingredients. 
 
-Recipe Finder will process your input and provide you with a recipe recommendation based on the ingredients you provided.
+If you'd like to replace the CSV file in the repository with your own CSV file of recipes. 
+Navigate to line 82 of the chatbot.py script: 
+```python
+#DataCSV file
+df = pd.read_csv('name_your_.csv')
+```
+Replace 'name_your_.csv' with the filename of your custom CSV file. Ensure that your CSV file follows the same format as the example provided.
 
-Data
-Recipe Finder uses a CSV file containing recipes and their ingredients. You can replace the name_your_csv file in the repository with your own CSV file containing recipes.
+## Contributing
+If you'd like to contribute to Recipe Finder, feel free to the repository and submit a pull request with your changes.
 
-Contributing
-If you'd like to contribute to Recipe Finder, feel free to fork the repository and submit a pull request with your changes.
+## License
+You can use VSC program to clone the program for free, and you can also use a program that is licensed - see the LICENSE file for details.
 
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
+[MIT](https://choosealicense.com/licenses/mit/)
