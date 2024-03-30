@@ -10,7 +10,7 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 # Meat and Fish
-meat_fish_keywords = ['Chicken', 'Beef', 'Pork', 'Salmon', 'Cod', 
+meat_fish_keywords = ['Chicken', 'Fish', 'Beef', 'Pork', 'Salmon', 'Cod', 
                       'Shrimp', 'Turkey', 'Lamb', 'Tuna', 'Bacon',
                       'Trout', 'Sardines', 'Duck', 'Ham', 'Sausage',
                       'Halibut', 'Crab', 'Octopus', 'Venison', 'Anchovies',
@@ -80,8 +80,8 @@ spices_keywords = ['Black pepper', 'Cayenne pepper', 'Chili powder', 'Cumin', 'C
                    'Sriracha', 'Habanero', 'Chipotle', 'Ghost pepper', 'Scotch bonnet']
 
 def keywords(user_input):
-    if user_input in ["meat", "fish"]:
-        return meat_fish_keywords
+    if user_input in meat_fish_keywords:
+        return "meaty dish"
     elif user_input == "grains":
         return grains_keywords
     elif user_input == "dairy":
@@ -105,9 +105,12 @@ def keywords(user_input):
 
 #Seperate the words in a setting
 def toktok_tokenize(data):
- toktok = nltk.ToktokTokenizer(data)
- toktok = [token for token in toktok if token not in string.punctuation]
- return toktok
+    toktok = nltk.ToktokTokenizer()
+    toktok.tokenize
+    toktok = [token for token in toktok if token not in string.punctuation]
+    #data = data.translate(str.maketrans('', '', string.punctuation))
+    #toktok = toktok.tokenize(data)
+    return toktok
 
 #Recognize the shortcuts of a word
 def stem(tokens):
@@ -175,6 +178,7 @@ def preprocess_input(text):
 def find_keywords(tokens, keywords):
     matched_keywords = [token for token in tokens if token.capitalize() in keywords]
     return matched_keywords
+    
 
 # Define a function to handle the conversation
 def chat():
@@ -184,25 +188,36 @@ def chat():
     print("Please write 'exit' when you are finished!")
 
     while True:
-        user_input = input("You: ").lower()  
+        user_input = input("You: ").lower() 
+        processed_input = preprocess_input(user_input)
+        #toktok_tokenize(processed_input)        
+        filter_for_stop_words(processed_input, stop_words)
+        stem(processed_input)
+        lemmatize(processed_input)
+        post_tagging(processed_input)
+        print(processed_input)
+        matched_keywords = find_keywords(processed_input, 
+        meat_fish_keywords + grains_keywords + dairy_keywords + 
+        fruits_vegetables_keywords + baking_keywords + beverages_keywords + 
+        sweet_keywords + sour_keywords + spices_keywords)
+
+        # categorized = keywords(matched_keywords)
+
+        # print(categorized) 
+
         if user_input == 'exit':
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
             break
     
     # Get keywords based on user input
-        category_keywords = keywords(user_input)
-        if category_keywords is None:
+      
+        if matched_keywords is None:
             print("I'm sorry, I didn't understand that ingredient. Please try again.")
             continue
 
-        print(f"The keywords for the '{user_input}' category are: {', '.join(category_keywords)}")
+        print(f"The keywords for the '{user_input}' category are: {', '.join(matched_keywords)}")
 
-        processed_input = preprocess_input(user_input)
-        toktok_tokenize(processed_input)        
-        filter_for_stop_words(processed_input)
-        stem(processed_input)
-        lemmatize(processed_input)
-        post_tagging(processed_input)
+       
 
         #DataCSV file
         df = pd.read_csv('recipies.csv')
@@ -221,12 +236,12 @@ def chat():
             toktok_tokens = toktok_tokenize_recipe(data)
 
             # Count matched words
-            matched_word_counts = [count_matched_words(toktok_tokens, category_keywords)]
+            matched_word_counts = [count_matched_words(toktok_tokens, matched_keywords)]
 
             # Find recipe with maximum matched words
             max_matched_recipe_index = max(range(len(matched_word_counts)), key=lambda i: sum(matched_word_counts[i].values()))
 
             print("Based on your ingredients, here's a recipe recommendation:")
-            print(data[max_matched_recipe_index]['recipe'])
+            print(data[max_matched_recipe_index]['Step list'])
 chat()
 
