@@ -151,22 +151,12 @@ def chat():
         keywords_all = filter_for_stop_words(keywords_all, stop_words)
         keywords_all = stem(keywords_all)
         keywords_all = lemmatize(keywords_all)
-        # print("\n")
-        # print(keywords_all)
-        # print("\n")
+       
         processed_input = find_keywords(processed_input, keywords_all)
-
-        # print("\n")
-        # print(processed_input)
-        # print("\n")
 
         if not processed_input:
             print("I'm sorry, I didn't understand that ingredient. Please try again.")
             continue
-
-        #print(f"The ingredients you mentioned are: {', '.join(processed_input)}")
-
-        
 
         max_match = 0
         indexer = 0
@@ -178,8 +168,6 @@ def chat():
             ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
             ingredient_token_list = stem(ingredient_token_list)
             ingredient_token_list = lemmatize(ingredient_token_list)
-
-
 
             match_counter = count_matched_ingredients(processed_input, ingredient_token_list)
             if(max_match < match_counter):
