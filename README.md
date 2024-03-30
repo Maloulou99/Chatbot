@@ -66,6 +66,6 @@ Replace 'name_your_csv' with the filename of your custom CSV file. Ensure that y
 If you'd like to contribute to Recipe Finder, feel free to the repository and submit a pull request with your changes.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+You can use VSC program to clone the program for free, and you can also use a program that is licensed - see the LICENSE file for details.
 
 [MIT](https://choosealicense.com/licenses/mit/)
