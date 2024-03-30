@@ -1,4 +1,4 @@
-# Chatbot - Recipe Finder
+# Chatbot - DishDive
 Hello and welcome to the Chatbot "Recipe Finder". The Chatbot can help you to find the perfect recipe for you!
 The search is based on your ingredients and preferences.
 
@@ -42,7 +42,7 @@ python -m nltk.downloader wordnet
 ```
 
 ## Usage 
-To use the "Recipe Finder" Chatbot correct, follow these steps: 
+To use the "DishDive" Chatbot correct, follow these steps: 
 1. Run the chatbot.py script:
 ```bash
 python chatbot.py
@@ -58,9 +58,9 @@ If you'd like to replace the CSV file in the repository with your own CSV file o
 Navigate to line 82 of the chatbot.py script: 
 ```python
 #DataCSV file
-df = pd.read_csv('name_your_csv')
+df = pd.read_csv('name_your_.csv')
 ```
-Replace 'name_your_csv' with the filename of your custom CSV file. Ensure that your CSV file follows the same format as the example provided.
+Replace 'name_your_.csv' with the filename of your custom CSV file. Ensure that your CSV file follows the same format as the example provided.
 
 ## Contributing
 If you'd like to contribute to Recipe Finder, feel free to the repository and submit a pull request with your changes.
