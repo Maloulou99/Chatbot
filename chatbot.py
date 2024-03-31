@@ -169,7 +169,7 @@ def chat():
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
             break
 
-        if prev_output == "You:":
+        if prev_output != user_input:
             print("DishDive:", end=" ")
         
         conversation.append(user_input) 
@@ -195,8 +195,7 @@ def chat():
                 print("Based on your ingredients, here is a recipe recommendation:")
                 print(matching_recipes[current_recipe_index]['Step'])
                 conversation.append(matching_recipes[current_recipe_index]['Step'])
-                current_recipe_index += 1
-                prev_output = "DishDive:"  
+                current_recipe_index += 1 
             else:
                 print("I have sent you all the recipes I have with your ingredients.")
                 repeat_response = input("Would you like to see a recipe again? (yes/no): ").lower()
@@ -205,14 +204,12 @@ def chat():
                     print("Here is the first recipe recommendation again:")
                     print(matching_recipes[current_recipe_index]['Step'])
                     conversation.append(matching_recipes[current_recipe_index]['Step'])
-                    current_recipe_index += 1
-                    prev_output = "DishDive:"  
+                    current_recipe_index += 1  
                 else:
                     print("I'm sorry, I couldn't find any more recipes matching your ingredients. Please try again.")
                     current_recipe_index = 0  # Reset current recipe index
                     repeated_recipe = False
         else:
-            print("I'm sorry, I couldn't find any recipes matching your ingredients. Please try again.")
-            prev_output = "DishDive:"  
+            print("I'm sorry, I couldn't find any recipes matching your ingredients. Please try again.") 
             
 chat()
