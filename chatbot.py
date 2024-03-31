@@ -124,9 +124,32 @@ def filter_for_stop_words(tokens, stop_words):
             filtered.append(word)
     return filtered
 
+# Give the Chatbot a chance to send a new recipe to the same userinput
+def get_matching_recipes(processed_input, data):
+    matching_recipes = []
+    for recipe in data:
+        ingredient_string = recipe['Ingredient']
+        ingredient_token_list = preprocess_input(ingredient_string)
+        ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
+        ingredient_token_list = stem(ingredient_token_list)
+        ingredient_token_list = lemmatize(ingredient_token_list)
 
-# Main chat function
+        match_counter = count_matched_ingredients(processed_input, ingredient_token_list)
+        if match_counter > 0:
+            matching_recipes.append((recipe, match_counter))
+
+    # Sort matching recipes by match counter in descending order
+    matching_recipes.sort(key=lambda x: x[1], reverse=True)
+
+    return [recipe[0] for recipe in matching_recipes]
+
+# Empty object to find new recipes and not the same, with the same userinput
+current_recipe_index = 0
+repeated_recipe = False
+
+# Main Chatbot chat
 def chat():
+    global current_recipe_index, repeated_recipe
     print("Hello, I hope you are doing well! Welcome to your personal Recipe Finder!")
     print("You can tell me which ingredients you have, and I can provide you with recipes based on those ingredients.")
     print("So let's start, what ingredients do you have?")
@@ -136,6 +159,9 @@ def chat():
     df = pd.read_csv('recipies.csv')
     data = df.to_dict(orient='records')
 
+    conversation = [] 
+    prev_output = None
+
     while True:
         user_input = input("You: ").lower() 
 
@@ -143,38 +169,50 @@ def chat():
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
             break
 
+        if prev_output == "You:":
+            print("DishDive:", end=" ")
+        
+        conversation.append(user_input) 
+
         processed_input = preprocess_input(user_input)
         processed_input = filter_for_stop_words(processed_input, stop_words)
         processed_input = stem(processed_input)
         processed_input = lemmatize(processed_input)
-        keywords_all = meat_fish_keywords + grains_keywords + dairy_keywords + fruits_vegetables_keywords + baking_keywords + beverages_keywords + sweet_keywords + sour_keywords + spices_keywords
+
+        keywords_all = (
+            meat_fish_keywords + grains_keywords + dairy_keywords + 
+            fruits_vegetables_keywords + baking_keywords + beverages_keywords + 
+            sweet_keywords + sour_keywords + spices_keywords
+        )
         keywords_all = filter_for_stop_words(keywords_all, stop_words)
         keywords_all = stem(keywords_all)
         keywords_all = lemmatize(keywords_all)
-       
         processed_input = find_keywords(processed_input, keywords_all)
+        matching_recipes = get_matching_recipes(processed_input, data)
 
-        if not processed_input:
-            print("I'm sorry, I didn't understand that ingredient. Please try again.")
-            continue
-
-        max_match = 0
-        indexer = 0
-        index_of_max = 0
-
-        for i in data:
-            ingredient_string = i['Ingredient']
-            ingredient_token_list = preprocess_input(ingredient_string)
-            ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
-            ingredient_token_list = stem(ingredient_token_list)
-            ingredient_token_list = lemmatize(ingredient_token_list)
-
-            match_counter = count_matched_ingredients(processed_input, ingredient_token_list)
-            if(max_match < match_counter):
-                max_match = match_counter
-                index_of_max = indexer
-            indexer += 1
-
-        print("Based on your ingredients, here's a recipe recommendation:")
-        print(data[index_of_max]['Step'])
+        if matching_recipes:
+            if current_recipe_index < len(matching_recipes):
+                print("Based on your ingredients, here is a recipe recommendation:")
+                print(matching_recipes[current_recipe_index]['Step'])
+                conversation.append(matching_recipes[current_recipe_index]['Step'])
+                current_recipe_index += 1
+                prev_output = "DishDive:"  
+            else:
+                print("I have sent you all the recipes I have with your ingredients.")
+                repeat_response = input("Would you like to see a recipe again? (yes/no): ").lower()
+                if repeat_response == 'yes':
+                    current_recipe_index = 0  # Reset current recipe index
+                    print("Here is the first recipe recommendation again:")
+                    print(matching_recipes[current_recipe_index]['Step'])
+                    conversation.append(matching_recipes[current_recipe_index]['Step'])
+                    current_recipe_index += 1
+                    prev_output = "DishDive:"  
+                else:
+                    print("I'm sorry, I couldn't find any more recipes matching your ingredients. Please try again.")
+                    current_recipe_index = 0  # Reset current recipe index
+                    repeated_recipe = False
+        else:
+            print("I'm sorry, I couldn't find any recipes matching your ingredients. Please try again.")
+            prev_output = "DishDive:"  
+            
 chat()
