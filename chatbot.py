@@ -8,77 +8,6 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Meat and Fish
-meat_fish_keywords = ['Chicken', 'Fish', 'Beef', 'Pork', 'Salmon', 'Cod', 
-                      'Shrimp', 'Turkey', 'Lamb', 'Tuna', 'Bacon',
-                      'Trout', 'Sardines', 'Duck', 'Ham', 'Sausage',
-                      'Halibut', 'Crab', 'Octopus', 'Venison', 'Anchovies',
-                      'Lobster', 'Haddock', 'Mussels', 'Swordfish', 'Quail',
-                      'Buffalo', 'Catfish', 'Oysters', 'Snapper']
-
-# Grains
-grains_keywords = ['Rice', 'Pasta', 'Quinoa', 'Bulgur', 'Oats', 
-                   'Bread', 'Noodles', 'Corn', 'Barley', 'Couscous',
-                   'Wheat', 'Rye', 'Farro', 'Polenta', 'Sorghum',
-                   'Millet', 'Amaranth', 'Buckwheat', 'Risotto', 'Orzo',
-                   'Spelt', 'Teff', 'Kamut', 'Triticale', 'Emmer',
-                   'Freekeh', 'Semolina', 'Basmati', 'Arborio']
-
-# Dairy Products
-dairy_keywords = ['Milk', 'Cheese', 'Butter', 'Cream', 'Yogurt', 
-                  'Eggs', 'Cottage cheese', 'Sour cream', 'Parmesan', 'Feta',
-                  'Mozzarella', 'Ricotta', 'Goat cheese', 'Brie', 'Cheddar',
-                  'Gouda', 'Swiss cheese', 'Havarti', 'Camembert', 'Provolone',
-                  'Blue cheese', 'Colby', 'Mascarpone', 'Limburger', 'Paneer',
-                  'Quark', 'Velveeta', 'Muenster', 'Manchego']
-
-# Fruits and Vegetables
-fruits_vegetables_keywords = ['Apples', 'Bananas', 'Oranges', 'Strawberries', 'Blueberries', 'Spinach', 
-                               'Tomatoes', 'Avocado', 'Lemons', 'Pineapples',
-                               'Mangoes', 'Grapes', 'Watermelon', 'Cucumbers', 'Bell peppers',
-                               'Peas', 'Carrots', 'Lettuce', 'Broccoli', 'Cauliflower',
-                               'Zucchini', 'Potatoes', 'Onions', 'Garlic', 'Ginger',
-                               'Kale', 'Brussels sprouts', 'Celery', 'Artichokes']
-
-# Baking Supplies
-baking_keywords = ['Flour', 'Sugar', 'Yeast', 'Baking powder', 'Chocolate', 'Vanilla extract', 
-                   'Honey', 'Almond flakes', 'Nuts', 'Cinnamon sticks',
-                   'Coconut flakes', 'Baking soda', 'Cocoa powder', 'Brown sugar', 'Powdered sugar',
-                   'Cornstarch', 'Shortening', 'Cake flour', 'Molasses', 'Cream of tartar',
-                   'Confectioners sugar', 'Granulated sugar', 'Light brown sugar', 'Dark brown sugar', 
-                   'Milk powder','Pectin', 'Vanilla bean', 'Candied peel', 'Gelatin']
-
-# Beverages
-beverages_keywords = ['Water', 'Coffee', 'Tea', 'Juice', 'Soda', 'Wine', 'Beer', 
-                      'Smoothies', 'Iced tea', 'Sports drinks',
-                      'Lemonade', 'Milkshake', 'Hot chocolate', 'Margarita', 'Mojito',
-                      'Sangria', 'Mimosa', 'Martini', 'Pina colada', 'Irish coffee',
-                      'Mai tai', 'Mint julep', 'Bloody Mary', 'Piña colada', 'White Russian',
-                      'Cosmopolitan', 'Long Island iced tea', 'Whiskey sour', 'Mudslide']
-
-# Sweet Ingredients
-sweet_keywords = ['Sugar', 'Honey', 'Maple syrup', 'Brown sugar', 'Vanilla', 
-                  'Chocolate', 'Caramel', 'Marshmallows', 'Fruit preserves', 'Condensed milk',
-                  'Butterscotch', 'Agave nectar', 'Candy canes', 'Toffee', 'Pralines',
-                  'Molasses', 'Rock candy', 'Buttercream', 'Jellybeans', 'Cotton candy',
-                  'Gum drops', 'Lollipop', 'Frosting', 'Candied ginger', 'Marzipan',
-                  'Turkish delight', 'Fudge', 'Sugar cubes', 'Caramel sauce', 'Butter toffee']
-
-# Sour Ingredients
-sour_keywords = ['Lemon', 'Lime', 'Vinegar', 'Yogurt', 'Sour cream', 'Buttermilk', 
-                 'Sour cherries', 'Tamarind', 'Sour apples', 'Sour candies',
-                 'Rhubarb', 'Gooseberries', 'Kiwi', 'Sour orange', 'Grapefruit',
-                 'Green apple', 'Sour grapes', 'Sour plum', 'Sour cherry', 'Sour grape',
-                 'Sour blueberries', 'Sour apricot', 'Sour raspberry', 'Sour mango', 'Sour peach',
-                 'Sour papaya', 'Sour pineapple', 'Sour strawberry', 'Sour banana', 'Sour pear']
-
-# Spices
-spices_keywords = ['Black pepper', 'Cayenne pepper', 'Chili powder', 'Cumin', 'Curry powder', 
-                   'Paprika', 'Red pepper flakes', 'Wasabi', 'Ginger', 'Mustard powder', 
-                   'Horseradish', 'Szechuan pepper', 'Jalapeno', 'Tabasco', 'Harissa', 
-                   'Sriracha', 'Habanero', 'Chipotle', 'Ghost pepper', 'Scotch bonnet']
-
-
 # Initializations and downloads
 stop_words = set(stopwords.words('english'))
 
@@ -99,9 +28,15 @@ def count_matched_ingredients(tokens, keywords):
     
     return count
 
-def find_keywords(tokens, keywords):
-    matched_keywords = [token for token in tokens if token in keywords]
-    return matched_keywords
+def find_keywords_and_category(tokens, all_words, categories):
+    matched_keywords = []
+    matched_categories = []
+    for token in tokens:
+        if token in all_words:
+            matched_keywords.append(token)
+        if token in categories:
+            matched_categories.append(token)
+    return matched_keywords, matched_categories
 
 #Recognize the shortcuts of a word
 def stem(tokens):
@@ -138,7 +73,6 @@ def get_matching_recipes(processed_input, data):
         if match_counter > 0:
             matching_recipes.append((recipe, match_counter))
 
-    # Sort matching recipes by match counter in descending order
     matching_recipes.sort(key=lambda x: x[1], reverse=True)
 
     return [recipe[0] for recipe in matching_recipes]
@@ -151,13 +85,15 @@ repeated_recipe = False
 def chat():
     global current_recipe_index, repeated_recipe
     print("Hello, I hope you are doing well! Welcome to your personal Recipe Finder!")
-    print("You can tell me which ingredients you have, and I can provide you with recipes based on those ingredients.")
-    print("So let's start, what ingredients do you have?")
+    print("You can tell me which ingredients or categories you have, and I can provide you with recipes based on those.")
+    print("So let's start, what ingredients or categories do you have?")
     print("Please write 'exit' when you are finished!")
 
-    # Load recipe data from CSV
-    df = pd.read_csv('recipies.csv')
+    df = pd.read_csv('csv/recipe.csv')
     data = df.to_dict(orient='records')
+
+    all_words = list(set(df['Keywords'].str.lower().str.split().sum()))
+    categories = list(set(df['Category'].str.lower()))
 
     conversation = [] 
     prev_output = None
@@ -178,38 +114,29 @@ def chat():
         processed_input = filter_for_stop_words(processed_input, stop_words)
         processed_input = stem(processed_input)
         processed_input = lemmatize(processed_input)
-
-        keywords_all = (
-            meat_fish_keywords + grains_keywords + dairy_keywords + 
-            fruits_vegetables_keywords + baking_keywords + beverages_keywords + 
-            sweet_keywords + sour_keywords + spices_keywords
-        )
-        keywords_all = filter_for_stop_words(keywords_all, stop_words)
-        keywords_all = stem(keywords_all)
-        keywords_all = lemmatize(keywords_all)
-        processed_input = find_keywords(processed_input, keywords_all)
-        matching_recipes = get_matching_recipes(processed_input, data)
+        matched_keywords, matched_categories = find_keywords_and_category(processed_input, all_words, categories)
+        matching_recipes = get_matching_recipes(matched_keywords + matched_categories, data)
 
         if matching_recipes:
             if current_recipe_index < len(matching_recipes):
-                print("Based on your ingredients, here is a recipe recommendation:")
+                print("Based on your ingredients or categories, here is a recipe recommendation:")
                 print(matching_recipes[current_recipe_index]['Step'])
                 conversation.append(matching_recipes[current_recipe_index]['Step'])
                 current_recipe_index += 1 
             else:
-                print("I have sent you all the recipes I have with your ingredients.")
-                repeat_response = input("Would you like to see a recipe again? (yes/no): ").lower()
+                print("I have sent you all the recipes I have with your ingredients or categories.")
+                repeat_response = input("Would you like to see a recipe again?\nYou: ").lower()
                 if repeat_response == 'yes':
-                    current_recipe_index = 0  # Reset current recipe index
+                    current_recipe_index = 0  
                     print("Here is the first recipe recommendation again:")
                     print(matching_recipes[current_recipe_index]['Step'])
                     conversation.append(matching_recipes[current_recipe_index]['Step'])
                     current_recipe_index += 1  
                 else:
-                    print("I'm sorry, I couldn't find any more recipes matching your ingredients. Please try again.")
-                    current_recipe_index = 0  # Reset current recipe index
+                    print("I'm sorry, I couldn't find any more recipes matching your ingredients or categories. Please try again.")
+                    current_recipe_index = 0 
                     repeated_recipe = False
         else:
-            print("I'm sorry, I couldn't find any recipes matching your ingredients. Please try again.") 
+            print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again.") 
             
 chat()
