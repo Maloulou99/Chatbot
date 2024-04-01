@@ -39,53 +39,37 @@ def filter_for_stop_words(tokens, stop_words):
             filtered.append(word)
     return filtered
 
-# Function to count matched ingredients
-def count_matched_ingredients(tokens, keywords):
-    set1 = set(tokens)
-    set2 = set(keywords)
+# Function to count matched colums from the userinput
+def count_matched_tokens(user_tokens, recipe_tokens):
+    set1 = set(user_tokens)
+    set2 = set(recipe_tokens)
 
-    # Count the number of matches
-    count = len(set1.intersection(set2))
+    total_matches = len(set1.intersection(set2))
 
-    return count
-
-def find_keywords_and_category(tokens, all_words, categories):
-    matched_keywords = []
-    matched_categories = []
-
-    for token in tokens:
-        if token in all_words:
-            matched_keywords.append(token)
-        if token in categories:
-            matched_categories.append(token)
-
-    return matched_keywords, matched_categories
+    return total_matches
 
 # Give the Chatbot a chance to send a new recipe to the same userinput
-def get_matching_recipes(matched_keywords, matched_categories, data):
+def get_matching_recipes(user_input, data): 
+    user_tokens = preprocess_input(user_input)
     matching_recipes = []
 
     for recipe in data:
-        if isinstance(recipe['Keywords'], str) and isinstance(recipe['Category'], str):
-            ingredient_string = recipe['Keywords'] + ' ' + recipe['Category']
-            ingredient_token_list = preprocess_input(ingredient_string)
-            ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
-            ingredient_token_list = stem(ingredient_token_list)
-            ingredient_token_list = lemmatize(ingredient_token_list)
+        match_counter = 0
+        for key, value in recipe.items():
+            if key in ['DishName', 'Step']:
+                continue  
+            if isinstance(value, str):
+                recipe_tokens = preprocess_input(value)
+                match_counter += count_matched_tokens(user_tokens, recipe_tokens)
 
-            # Count matched ingredients
-            match_counter = count_matched_ingredients(matched_keywords + matched_categories, ingredient_token_list)
-            matching_recipes.append((recipe, match_counter))
+        matching_recipes.append((recipe, match_counter))
 
-    # Find max match count
-    max_match_count = max(matching_recipes, key=lambda x: x[1])[1]
+    if matching_recipes:
+        max_match_count = max(matching_recipes, key=lambda x: x[1])[1]
+        top_matching_recipes = [recipe[0] for recipe in matching_recipes if recipe[1] == max_match_count]
 
-    # Get recipes with the highest number of matching ingredients
-    top_matching_recipes = [recipe[0] for recipe in matching_recipes if recipe[1] == max_match_count]
+        return top_matching_recipes
 
-    return top_matching_recipes
-
-# Empty object to find new recipes and not the same, with the same userinput
 current_recipe_index = 0
 repeated_recipe = False
 
@@ -104,7 +88,7 @@ def chat():
     processed_all_words = stem(all_words)
     processed_all_words = lemmatize(processed_all_words)
 
-    categories = list(set(df['Category'].str.lower()))
+    #categories = list(set(df['Category'].str.lower()))
 
     conversation = [] 
     prev_output = None
@@ -125,8 +109,8 @@ def chat():
         processed_input = filter_for_stop_words(processed_input, stop_words)
         processed_input = stem(processed_input)
         processed_input = lemmatize(processed_input)
-        matched_keywords, matched_categories = find_keywords_and_category(processed_input, processed_all_words, categories)
-        matching_recipes = get_matching_recipes(matched_keywords, matched_categories, data)
+        #processed_input = find_keywords_and_category(processed_input, processed_all_words, categories)
+        matching_recipes = get_matching_recipes(user_input, data)  
 
         if matching_recipes:
             if current_recipe_index < len(matching_recipes):
