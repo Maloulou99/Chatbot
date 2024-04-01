@@ -43,16 +43,17 @@ python -m nltk.downloader wordnet
 
 ## Usage 
 To use the "DishDive" Chatbot correct, follow these steps: 
-1. Run the chatbot.py script:
+1. First run csv_function.py file to update the recipe.csv with values
+2. Run the chatbot.py script:
 ```bash
 python chatbot.py
 ```
-2. Follow the Chatbots prompt and add your ingredients and preferences.
-3. Recipe Finder will process the information you have entered and provide you with a recipe recommendation based on the ingredients you have available. 
-4. Type exit when you're finished. This will signal to the Chatbot that you have received a recipe that suits you.
+3. Follow the Chatbots prompt and add your ingredients and preferences.
+4. DishDive will process the information you have entered and provide you with a recipe recommendation based on the ingredients you have available. 
+5. Type exit when you're finished. This will signal to the Chatbot that you have received a recipe that suits you.
 
 ## Data
-Recipe Finder uses a CSV file of recipes and their ingredients. 
+DishDive uses a CSV file of recipes and their ingredients. 
 
 If you'd like to replace the CSV file in the repository with your own CSV file of recipes. 
 Navigate to line 82 of the chatbot.py script: 
@@ -63,7 +64,7 @@ df = pd.read_csv('name_your_.csv')
 Replace 'name_your_.csv' with the filename of your custom CSV file. Ensure that your CSV file follows the same format as the example provided.
 
 ## Contributing
-If you'd like to contribute to Recipe Finder, feel free to the repository and submit a pull request with your changes.
+If you'd like to contribute to DishDiver, feel free to the repository and submit a pull request with your changes.
 
 ## License
 You can use VSC program to clone the program for free, and you can also use a program that is licensed - see the LICENSE file for details.
