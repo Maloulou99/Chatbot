@@ -18,26 +18,6 @@ def preprocess_input(text):
     tokens = [token for token in tokens if token not in stop_words]
     return tokens
 
-# Function to count matched ingredients
-def count_matched_ingredients(tokens, keywords):
-    set1 = set(tokens)
-    set2 = set(keywords)
-
-    # Count the number of matches
-    count = len(set1.intersection(set2))
-    
-    return count
-
-def find_keywords_and_category(tokens, all_words, categories):
-    matched_keywords = []
-    matched_categories = []
-    for token in tokens:
-        if token in all_words:
-            matched_keywords.append(token)
-        if token in categories:
-            matched_categories.append(token)
-    return matched_keywords, matched_categories
-
 #Recognize the shortcuts of a word
 def stem(tokens):
  lancaster = LancasterStemmer()
@@ -59,6 +39,27 @@ def filter_for_stop_words(tokens, stop_words):
             filtered.append(word)
     return filtered
 
+# Function to count matched ingredients
+def count_matched_ingredients(tokens, keywords):
+    set1 = set(tokens)
+    set2 = set(keywords)
+
+    # Count the number of matches
+    count = len(set1.intersection(set2))
+
+    return count
+
+def find_keywords_and_category(tokens, all_words, categories):
+    matched_keywords = []
+    matched_categories = []
+    for token in tokens:
+        if token in all_words:
+            matched_keywords.append(token)
+        if token in categories:
+            matched_categories.append(token)
+
+    return matched_keywords, matched_categories
+
 # Give the Chatbot a chance to send a new recipe to the same userinput
 def get_matching_recipes(processed_input, data):
     matching_recipes = []
@@ -68,7 +69,8 @@ def get_matching_recipes(processed_input, data):
         ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
         ingredient_token_list = stem(ingredient_token_list)
         ingredient_token_list = lemmatize(ingredient_token_list)
-
+    
+        print(processed_input)
         match_counter = count_matched_ingredients(processed_input, ingredient_token_list)
         if match_counter > 0:
             matching_recipes.append((recipe, match_counter))
@@ -93,6 +95,9 @@ def chat():
     data = df.to_dict(orient='records')
 
     all_words = list(set(df['Keywords'].str.lower().str.split().sum()))
+    processed_all_words = stem(all_words)
+    processed_all_words = lemmatize(processed_all_words)
+
     categories = list(set(df['Category'].str.lower()))
 
     conversation = [] 
@@ -114,12 +119,13 @@ def chat():
         processed_input = filter_for_stop_words(processed_input, stop_words)
         processed_input = stem(processed_input)
         processed_input = lemmatize(processed_input)
-        matched_keywords, matched_categories = find_keywords_and_category(processed_input, all_words, categories)
+        matched_keywords, matched_categories = find_keywords_and_category(processed_input, processed_all_words, categories)
         matching_recipes = get_matching_recipes(matched_keywords + matched_categories, data)
 
         if matching_recipes:
             if current_recipe_index < len(matching_recipes):
                 print("Based on your ingredients or categories, here is a recipe recommendation:")
+                print(matching_recipes[current_recipe_index]['DishName'])
                 print(matching_recipes[current_recipe_index]['Step'])
                 conversation.append(matching_recipes[current_recipe_index]['Step'])
                 current_recipe_index += 1 
@@ -137,6 +143,6 @@ def chat():
                     current_recipe_index = 0 
                     repeated_recipe = False
         else:
-            print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again.") 
+            print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again. Thank you.") 
             
 chat()
