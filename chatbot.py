@@ -52,6 +52,7 @@ def count_matched_ingredients(tokens, keywords):
 def find_keywords_and_category(tokens, all_words, categories):
     matched_keywords = []
     matched_categories = []
+
     for token in tokens:
         if token in all_words:
             matched_keywords.append(token)
@@ -61,23 +62,28 @@ def find_keywords_and_category(tokens, all_words, categories):
     return matched_keywords, matched_categories
 
 # Give the Chatbot a chance to send a new recipe to the same userinput
-def get_matching_recipes(processed_input, data):
+def get_matching_recipes(matched_keywords, matched_categories, data):
     matching_recipes = []
+
     for recipe in data:
-        ingredient_string = recipe['Ingredient']
-        ingredient_token_list = preprocess_input(ingredient_string)
-        ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
-        ingredient_token_list = stem(ingredient_token_list)
-        ingredient_token_list = lemmatize(ingredient_token_list)
-    
-        print(processed_input)
-        match_counter = count_matched_ingredients(processed_input, ingredient_token_list)
-        if match_counter > 0:
+        if isinstance(recipe['Keywords'], str) and isinstance(recipe['Category'], str):
+            ingredient_string = recipe['Keywords'] + ' ' + recipe['Category']
+            ingredient_token_list = preprocess_input(ingredient_string)
+            ingredient_token_list = filter_for_stop_words(ingredient_token_list, stop_words)
+            ingredient_token_list = stem(ingredient_token_list)
+            ingredient_token_list = lemmatize(ingredient_token_list)
+
+            # Count matched ingredients
+            match_counter = count_matched_ingredients(matched_keywords + matched_categories, ingredient_token_list)
             matching_recipes.append((recipe, match_counter))
 
-    matching_recipes.sort(key=lambda x: x[1], reverse=True)
+    # Find max match count
+    max_match_count = max(matching_recipes, key=lambda x: x[1])[1]
 
-    return [recipe[0] for recipe in matching_recipes]
+    # Get recipes with the highest number of matching ingredients
+    top_matching_recipes = [recipe[0] for recipe in matching_recipes if recipe[1] == max_match_count]
+
+    return top_matching_recipes
 
 # Empty object to find new recipes and not the same, with the same userinput
 current_recipe_index = 0
@@ -120,7 +126,7 @@ def chat():
         processed_input = stem(processed_input)
         processed_input = lemmatize(processed_input)
         matched_keywords, matched_categories = find_keywords_and_category(processed_input, processed_all_words, categories)
-        matching_recipes = get_matching_recipes(matched_keywords + matched_categories, data)
+        matching_recipes = get_matching_recipes(matched_keywords, matched_categories, data)
 
         if matching_recipes:
             if current_recipe_index < len(matching_recipes):

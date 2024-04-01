@@ -13,38 +13,48 @@ def add_keywords_by_category():
         return None
 
     recipes_df['Keywords'] = recipes_df['Keywords'].astype(str)
-    categories_df['Category'] = categories_df['Category'].astype(str)
-    keywords_df['Keywords'] = keywords_df['Keywords'].astype(str)
 
     category_keywords = {}
-
-    for index, row in keywords_df.iterrows():
-        keyword = row['Keywords']
-        category = row['Category']
-        if category not in category_keywords:
-            category_keywords[category] = []
-        category_keywords[category].append(keyword)
 
     for index, row in categories_df.iterrows():
         category = row['Category']
         keywords = row['Keywords'].split()
-        if category in category_keywords:
-            category_keywords[category].extend(keywords)
-        else:
-            category_keywords[category] = keywords
+        category_keywords[category] = keywords
+        print(f"(1) Category: {category}, Keywords: {keywords}")
+        print(" ----------------------------------")
+
+    recipes_df['Category'] = '' #Delete the kolone for test
+    recipes_df['Keywords'] = ''
 
     for index, row in recipes_df.iterrows():
-        dish_name = str(row['DishName'])
-        dish_keywords = row['Keywords'].split() if isinstance(row['Keywords'], str) else []
+        dish_name = row['DishName']
         matching_categories = []
+        dish_keywords = []
         for category, keywords_list in category_keywords.items():
-            if isinstance(category, str) and isinstance(dish_name, str):
-                if any(keyword.lower() in dish_name.lower() for keyword in keywords_list):
-                    dish_keywords.extend(keywords_list)
-                    matching_categories.append(category)
+            if any(keyword.lower() in dish_name.lower() for keyword in keywords_list):
+                matching_categories.append(category)
+                dish_keywords.extend(keywords_list)
         dish_keywords = list(set(dish_keywords))
         recipes_df.at[index, 'Keywords'] = ' '.join(dish_keywords)
         recipes_df.at[index, 'Category'] = ', '.join(matching_categories)
+        print(f"(2) Dish: {dish_name}, Categories: {matching_categories}, Keywords: {dish_keywords}\n")
+        print(" ----------------------------------")
+
+    for index, row in keywords_df.iterrows():
+        dish_name = row['DishName']
+        dish_keywords = row['Keywords']
+        dish_category = row['Category']
+        if isinstance(dish_keywords, str):
+            matching_row = recipes_df[recipes_df['DishName'] == dish_name]
+            if not matching_row.empty:
+                current_keywords = matching_row['Keywords'].iloc[0]
+                if isinstance(current_keywords, str):
+                    current_keywords += ' ' + dish_keywords
+                else:
+                    current_keywords = dish_keywords
+                recipes_df.at[matching_row.index[0], 'Keywords'] = current_keywords
+                print(f"(3) Dish: {dish_name}, Keywords: {dish_keywords}, Category: {dish_category}\n")
+                print(" ----------------------------------")
 
     recipes_df.to_csv(recipes_file, index=False)
 
