@@ -1,4 +1,5 @@
 import pandas as pd
+from text_processing import preprocess_input, stem, lemmatize
 
 def add_keywords_by_category():
     recipes_file = 'csv/recipe.csv'
@@ -16,46 +17,77 @@ def add_keywords_by_category():
 
     category_keywords = {}
 
+    # Building the category_keywords dictionary
     for index, row in categories_df.iterrows():
         category = row['Category']
-        keywords = row['Keywords'].split()
-        category_keywords[category] = keywords
-        print(f"(1) Category: {category}, Keywords: {keywords}")
+        keywords = preprocess_input(row['Keywords'])
+        stemmed_keywords = stem(keywords)
+        lemmatized_keywords = lemmatize(keywords)
+        combined_keywords = set(keywords + stemmed_keywords + lemmatized_keywords)
+        category_keywords[category] = combined_keywords
+        print(f"Category: {category}, Combined Keywords: {combined_keywords}")
         print(" ----------------------------------")
 
-    recipes_df['Category'] = '' #Delete the kolone for test
-    recipes_df['Keywords'] = ''
+
+    recipes_df['Category'] = '' 
+    recipes_df['Keywords'] = ''  
 
     for index, row in recipes_df.iterrows():
         dish_name = row['DishName']
-        matching_categories = []
-        dish_keywords = []
+        dish_tokens = preprocess_input(dish_name)
+        stemmed_dish_tokens = stem(dish_tokens)
+        lemmatized_dish_tokens = lemmatize(dish_tokens)
+        combined_dish_tokens = set(dish_tokens + stemmed_dish_tokens + lemmatized_dish_tokens)
+
+        matching_categories = set()
+        dish_keywords = set()
+
         for category, keywords_list in category_keywords.items():
-            if any(keyword.lower() in dish_name.lower() for keyword in keywords_list):
-                matching_categories.append(category)
-                dish_keywords.extend(keywords_list)
-        dish_keywords = list(set(dish_keywords))
+            if any(keyword in combined_dish_tokens for keyword in keywords_list):
+                matching_categories.add(category)
+                dish_keywords.update(keywords_list)
+
         recipes_df.at[index, 'Keywords'] = ' '.join(dish_keywords)
         recipes_df.at[index, 'Category'] = ', '.join(matching_categories)
+
         print(f"(2) Dish: {dish_name}, Categories: {matching_categories}, Keywords: {dish_keywords}\n")
         print(" ----------------------------------")
 
+
+    # Adding additional keywords from the keywords file
     for index, row in keywords_df.iterrows():
         dish_name = row['DishName']
-        dish_keywords = row['Keywords']
-        dish_category = row['Category']
-        if isinstance(dish_keywords, str):
-            matching_row = recipes_df[recipes_df['DishName'] == dish_name]
-            if not matching_row.empty:
-                current_keywords = matching_row['Keywords'].iloc[0]
-                if isinstance(current_keywords, str):
-                    current_keywords += ' ' + dish_keywords
-                else:
-                    current_keywords = dish_keywords
-                recipes_df.at[matching_row.index[0], 'Keywords'] = current_keywords
-                print(f"(3) Dish: {dish_name}, Keywords: {dish_keywords}, Category: {dish_category}\n")
-                print(" ----------------------------------")
+        additional_keywords = preprocess_input(row['Keywords'])
+        stemmed_additional_keywords = stem(additional_keywords)
+        lemmatized_additional_keywords = lemmatize(additional_keywords)
+        combined_additional_keywords = set(additional_keywords + stemmed_additional_keywords + lemmatized_additional_keywords)
 
+        matching_row = recipes_df[recipes_df['DishName'] == dish_name]
+
+        if not matching_row.empty:
+            # Getting current keywords and categories
+            current_keywords = set(matching_row['Keywords'].iloc[0].split())
+            current_categories = set(matching_row['Category'].iloc[0].split(', '))
+
+            # Adding new keywords
+            current_keywords.update(combined_additional_keywords)
+
+            # Adding matching categories based on additional keywords
+            for keyword in combined_additional_keywords:
+                for category, keywords_list in category_keywords.items():
+                    if keyword in keywords_list:
+                        current_categories.add(category)
+
+            # Updating the DataFrame
+            updated_keywords = ' '.join(current_keywords)
+            updated_categories = ', '.join(filter(None, current_categories))
+            recipes_df.at[matching_row.index[0], 'Keywords'] = updated_keywords
+            recipes_df.at[matching_row.index[0], 'Category'] = updated_categories
+
+            print(f"(3) Dish: {dish_name}, Additional Keywords: {additional_keywords}, Categories: {current_categories}\n")
+            print(" ----------------------------------")
+
+    # Save the updated recipes DataFrame back to the CSV
     recipes_df.to_csv(recipes_file, index=False)
 
     return recipes_df

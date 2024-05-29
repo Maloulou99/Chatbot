@@ -1,6 +1,6 @@
 DishName,Keywords,Category
-Spaghetti Carbonara, pasta Italian creamy bacon egg,meat
-Classic Beef Burger, burger beef classic savory juicy,meat
+Spaghetti Carbonara, pasta Italian creamy bacon egg,Meet
+Classic Beef Burger, burger beef classic savory juicy,Meat
 Margarita Pizza, pizza Italian tomato mozzarella basil vegetable vegetar,Fruits and Vegetables
 Chicken Alfredo Pasta, pasta chicken creamy Alfredo cheesy,Grains
 Vegetable Stir-Fry, stir-fry vegetable healthy savory Asian vegetar,Fruits and Vegetables
@@ -11,7 +11,7 @@ Tiramisu, coffee dessert creamy Italian sweet,Sweet
 Cheesecake, dessert creamy rich sweet classic vegetar,Sweet
 Chocolate Mousse, chocolate sweet creamy dessert vegetar,Sweet
 Tomato Basil Soup, soup tomato basil savory comforting vegetar
-Chicken Tortilla Soup, soup chicken spicy tomato Mexican
+Chicken Tortilla Soup, soup chicken spicy tomato Mexican,Meat
 Spaghetti Bolognese, pasta beef Italian savory hearty vegetar
 Chicken Caesar Salad, salad chicken Caesar fresh crispy vegetar
 Hazelnut Chicken with Honey Glaze, chicken nuts hazelnuts honey glaze savory,Baking

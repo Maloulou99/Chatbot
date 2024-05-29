@@ -1,56 +1,8 @@
 import pandas as pd
-import string
-import nltk
-from nltk.corpus import stopwords
-from nltk.stem import LancasterStemmer, WordNetLemmatizer
+from text_processing import preprocess_input, stem, lemmatize, filter_for_stop_words, count_matched_tokens
 
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
-
-# Initializations and downloads
-stop_words = set(stopwords.words('english'))
-
-# Function to preprocess user input
-def preprocess_input(text):
-    tokens = nltk.word_tokenize(text.lower())
-    tokens = [token for token in tokens if token not in string.punctuation]
-    tokens = [token for token in tokens if token not in stop_words]
-    return tokens
-
-#Recognize the shortcuts of a word
-def stem(tokens):
- lancaster = LancasterStemmer()
- lancasterstemmed_tokens = [lancaster.stem(token) for token in tokens]
- return lancasterstemmed_tokens
-
-#Recognize the root words
-def lemmatize(tokens):
-    lemmatizer = WordNetLemmatizer()
-    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]
-    return lemmatized_tokens
-
-#Deleting the words we dont have in keywords
-stop_words = stopwords.words('english')
-def filter_for_stop_words(tokens, stop_words):
-    filtered = []
-    for word in tokens:
-        if word not in stop_words:
-            filtered.append(word)
-    return filtered
-
-# Function to count matched colums from the userinput
-def count_matched_tokens(user_tokens, recipe_tokens):
-    set1 = set(user_tokens)
-    set2 = set(recipe_tokens)
-
-    total_matches = len(set1.intersection(set2))
-
-    return total_matches
-
-# Give the Chatbot a chance to send a new recipe to the same userinput
-def get_matching_recipes(user_input, data): 
-    user_tokens = preprocess_input(user_input)
+# Function to get matching recipes based on user input
+def get_matching_recipes(user_tokens, data): 
     matching_recipes = []
 
     for recipe in data:
@@ -67,15 +19,16 @@ def get_matching_recipes(user_input, data):
     if matching_recipes:
         max_match_count = max(matching_recipes, key=lambda x: x[1])[1]
         top_matching_recipes = [recipe[0] for recipe in matching_recipes if recipe[1] == max_match_count]
-
         return top_matching_recipes
 
+    return []
+
 current_recipe_index = 0
-repeated_recipe = False
+previous_user_tokens = []
 
 # Main Chatbot chat
 def chat():
-    global current_recipe_index, repeated_recipe
+    global current_recipe_index, previous_user_tokens
     print("Hello, I hope you are doing well! Welcome to your personal Recipe Finder!")
     print("You can tell me which ingredients or categories you have, and I can provide you with recipes based on those.")
     print("So let's start, what ingredients or categories do you have?")
@@ -84,14 +37,9 @@ def chat():
     df = pd.read_csv('csv/recipe.csv')
     data = df.to_dict(orient='records')
 
-    all_words = list(set(df['Keywords'].str.lower().str.split().sum()))
-    processed_all_words = stem(all_words)
-    processed_all_words = lemmatize(processed_all_words)
-
-    #categories = list(set(df['Category'].str.lower()))
-
     conversation = [] 
     prev_output = None
+    printed_keywords = False
 
     while True:
         user_input = input("You: ").lower() 
@@ -100,17 +48,25 @@ def chat():
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
             break
 
+        if not user_input:
+            print("DishDive: It seems you haven't entered anything. How can I assist you today?")
+            continue
+
         if prev_output != user_input:
             print("DishDive:", end=" ")
-        
+
         conversation.append(user_input) 
 
+        # Process user input
         processed_input = preprocess_input(user_input)
-        processed_input = filter_for_stop_words(processed_input, stop_words)
+        processed_input = filter_for_stop_words(processed_input)
         processed_input = stem(processed_input)
         processed_input = lemmatize(processed_input)
-        #processed_input = find_keywords_and_category(processed_input, processed_all_words, categories)
-        matching_recipes = get_matching_recipes(user_input, data)  
+
+        previous_user_tokens.extend(processed_input)
+
+        # Get matching recipes
+        matching_recipes = get_matching_recipes(previous_user_tokens, data)  
 
         if matching_recipes:
             if current_recipe_index < len(matching_recipes):
@@ -121,20 +77,19 @@ def chat():
                 current_recipe_index += 1 
             else:
                 print("I have sent you all the recipes I have with your ingredients or categories.")
-                repeat_response = input("Would you like to see a recipe again?\nYou: ").lower()
-                if repeat_response == 'yes':
-                    current_recipe_index = 0  
-                    print("Here is the first recipe recommendation again:")
-                    print(matching_recipes[current_recipe_index]['Step'])
-                    conversation.append(matching_recipes[current_recipe_index]['Step'])
-                    current_recipe_index += 1  
-                else:
-                    print("I'm sorry, I couldn't find any more recipes matching your ingredients or categories. Please try again.")
-                    current_recipe_index = 0 
-                    repeated_recipe = False
-        else:
-            print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again. Thank you.") 
-            
+                if not printed_keywords:
+                    unique_tokens = set(previous_user_tokens)
+                    unique_tokens_list = list(unique_tokens)
+                    print(f"You had searched on: {', '.join(unique_tokens_list)}")
+                new_input = input("Would you like to search for something else?\nYou: ").lower()
+                previous_user_tokens = preprocess_input(new_input)
+                previous_user_tokens = filter_for_stop_words(previous_user_tokens)
+                previous_user_tokens = stem(previous_user_tokens)
+                previous_user_tokens = lemmatize(previous_user_tokens)
+                printed_keywords = False
+
+                if matching_recipes and new_input != 'exit':
+                    print("DishDive: What else can I help you with? ", end="\n")
+                    continue
+
 chat()
-
-
