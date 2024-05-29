@@ -1,7 +1,8 @@
 import nltk
 import string
-from nltk.corpus import stopwords
 from nltk.stem import LancasterStemmer, WordNetLemmatizer
+from enchant.checker import SpellChecker
+from nltk.corpus import stopwords
 
 # Ensure necessary nltk data is downloaded
 nltk.download('punkt')
@@ -15,7 +16,6 @@ stop_words = set(stopwords.words('english'))
 def preprocess_input(text):
     tokens = nltk.word_tokenize(text.lower())
     tokens = [token for token in tokens if token not in string.punctuation]
-    tokens = [token for token in tokens if token not in stop_words]
     return tokens
 
 # Function to stem tokens
@@ -31,12 +31,16 @@ def lemmatize(tokens):
     return lemmatized_tokens
 
 # Function to filter out stop words
-def filter_for_stop_words(tokens):
+def filter_for_stop_words(tokens, stop_words):
     return [word for word in tokens if word not in stop_words]
 
-# Function to count matched tokens between user input and recipe
-def count_matched_tokens(user_tokens, recipe_tokens):
-    set1 = set(user_tokens)
-    set2 = set(recipe_tokens)
-    total_matches = len(set1.intersection(set2))
-    return total_matches
+# Function to correct spelling errors
+def correct_spelling(text):
+    checker = SpellChecker("en_US")
+    checker.set_text(text)
+    for err in checker:
+        suggestions = err.suggest()
+        if suggestions:
+            err.replace(suggestions[0])
+    corrected_text = checker.get_text()
+    return corrected_text
