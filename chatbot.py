@@ -6,7 +6,6 @@ from nltk.corpus import stopwords
 # Initialize the English dictionary for spell checking
 spell_checker = enchant.Dict("en_US")
 
-# Initialize stop words
 stop_words = set(stopwords.words('english'))
 
 # Function to count matched columns from the user input
@@ -18,15 +17,32 @@ def count_matched_tokens(user_tokens, recipe_tokens):
 
     return total_matches
 
+# Function to extract exclusion ingredients from the user input
+def extract_exclusions(user_input):
+    exclusion_keywords = ["without", "no"]
+    exclusions = []
+
+    words = user_input.split()
+    for i, word in enumerate(words):
+        if word in exclusion_keywords and i + 1 < len(words):
+            exclusions.append(words[i + 1])
+
+    return exclusions
+
 # Give the Chatbot a chance to send a new recipe to the same user input
 def get_matching_recipes(user_input, data): 
     user_tokens = preprocess_input(user_input)
+    exclusions = extract_exclusions(user_input)
     matching_recipes = []
 
     for recipe in data:
         match_counter = 0
         recipe_description = ' '.join(str(v) for k, v in recipe.items() if k not in ['DishName', 'Step', 'Keywords', 'Category'])
         recipe_tokens = preprocess_input(recipe_description)
+
+        # Skip recipes that contain excluded ingredients
+        if any(exclusion in recipe_tokens for exclusion in exclusions):
+            continue
 
         for user_token in user_tokens:
             if user_token in recipe_tokens:
@@ -43,12 +59,11 @@ def get_matching_recipes(user_input, data):
 current_recipe_index = 0
 repeated_recipe = False
 
-
 def chat():
     global current_recipe_index, repeated_recipe
     print("Hello, I hope you are doing well! Welcome to your personal Recipe Finder!")
     print("You can tell me which ingredients or categories you have, and I can provide you with recipes based on those.")
-    print("So let's start, what ingredients or categories do you have?")
+    print("You can also specify ingredients to exclude by saying 'without [ingredient]' or 'no [ingredient]'.")
     print("Please write 'exit' when you are finished!")
 
     df = pd.read_csv('csv/recipe.csv')
@@ -97,7 +112,7 @@ def chat():
                 print(matching_recipes[current_recipe_index]['Step'])
                 conversation.append(matching_recipes[current_recipe_index]['Step'])
 
-                current_recipe_index =+ 1
+                current_recipe_index += 1
 
             else:
                 print("I have sent you all the recipes I have with your ingredients or categories.")
