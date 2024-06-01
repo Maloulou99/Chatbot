@@ -18,6 +18,13 @@ def preprocess_input(text):
     tokens = [token for token in tokens if token not in string.punctuation]
     return tokens
 
+def preprocess_input_chat(input_text):
+    tokens = nltk.word_tokenize(input_text)
+
+    tokens_lower = [token.lower() for token in tokens]
+    
+    return tokens_lower
+
 # Function to stem tokens
 def stem(tokens):
     lancaster = LancasterStemmer()
