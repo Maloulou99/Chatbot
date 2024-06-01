@@ -160,11 +160,8 @@ def get_matching_recipes(user_input, data_filename):
 
     # Sort matching recipes based on match scores
     matching_recipes.sort(key=lambda x: match_scores.get(x['DishName'], 0), reverse=True)
-    
-    if not matching_recipes:
-        raise ValueError("No matching recipes found for this request. Please try again with different criteria.")
-    
-    return matching_recipes
+
+    return matching_recipes or matching_recipes == False
 
 
 def extract_num_persons(input_text):
@@ -180,14 +177,14 @@ def chat():
 
     conversation = []
     prev_output = None
-    recommended_recipes = []  # List to keep track of recommended recipes
+    recommended_recipes = []  
 
     while True:
         user_input = input("You: ").lower()
 
         if user_input == 'exit':
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
-            break  # Added break to exit the loop
+            break  
 
         if user_input.strip() == '':
             print("I'm sorry, I couldn't detect any input. Please try again.")
@@ -197,40 +194,48 @@ def chat():
             print("DishDive:", end=" ")
 
         conversation.append(user_input)
-
-        # Perform spell checking and correct spelling
         corrected_input = correct_spelling(user_input)
 
-        # If the corrected input is different from the original input
         if corrected_input != user_input:
             user_input = corrected_input
 
         try:
             matching_recipes = get_matching_recipes(user_input, 'csv/recipe.csv')
         except ValueError as e:
-            print(e)
+            if matching_recipes is not False:
+                print(e)
             continue
 
-        if matching_recipes:
-            # Sort matching recipes based on match count
-            matching_recipes.sort(key=lambda x: count_matched_tokens(preprocess_input(user_input), preprocess_input(x['Ingredient'])), reverse=True)
-            
-            # Filter out already recommended recipes
-            new_matching_recipes = [recipe for recipe in matching_recipes if recipe['DishName'] not in recommended_recipes]
-            
-            if new_matching_recipes:
-                print("Based on your ingredients or categories, here is a recipe recommendation:")
-                print(new_matching_recipes[0]['DishName'])
+        if not matching_recipes:
+            print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again. Thank you.")
+            continue  # Start the chat loop again if no recipes were found
 
-                num_persons = extract_num_persons(user_input)
-                adjusted_recipe = adjust_recipe_for_persons(new_matching_recipes[0], num_persons)
-                print("Ingredients:")
-                print(adjusted_recipe['Ingredient'])
-                print("Steps:")
-                print(adjusted_recipe['Step'])
-                conversation.append(adjusted_recipe['Step'])
+        # Sort matching recipes based on match count
+        matching_recipes.sort(key=lambda x: count_matched_tokens(preprocess_input(user_input), preprocess_input(x['Ingredient'])))
+        new_matching_recipes = [recipe for recipe in matching_recipes if recipe['DishName'] not in recommended_recipes]
+        
+        if new_matching_recipes and new_matching_recipes[0]['DishName'] != 'DishName':
+            print("Based on your ingredients or categories, here is a recipe recommendation:")
+            print(new_matching_recipes[0]['DishName'])
 
-                recommended_recipes.append(new_matching_recipes[0]['DishName'])
+            num_persons = extract_num_persons(user_input)
+            adjusted_recipe = adjust_recipe_for_persons(new_matching_recipes[0], num_persons)
+            print("Ingredients:")
+            print(adjusted_recipe['Ingredient'])
+            print("Steps:")
+            print(adjusted_recipe['Step'])
+            conversation.append(adjusted_recipe['Step'])
+
+            recommended_recipes.append(new_matching_recipes[0]['DishName'])
+        else:
+            if not recommended_recipes:
+                user_response = input("I'm sorry, there are no recipes matching your criteria. Would you like to try again or exit? \nYou: ").lower()
+                user_response = correct_spelling(user_response)
+
+                if contains_yes_or_no(user_response) == 'yes':
+                    continue  # Start the chat loop again
+                else:
+                    break  # Exit the chat loop
             else:
                 print("I'm sorry, there are no more recipes matching your criteria and previous recommendations.")
                 user_response = input("Do you want to see a previous recipe again or change your criteria? \nYou: ").lower()
@@ -253,7 +258,7 @@ def chat():
                     conversation.clear()
                     recommended_recipes.clear()
                     print("You can start a new search now.")
-        else:
-            print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again. Thank you.")
+
+    print("Thank you for using the Recipe Finder! Goodbye and have a great day!")
 
 chat()
