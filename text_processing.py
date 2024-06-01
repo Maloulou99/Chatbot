@@ -2,7 +2,6 @@ import nltk
 import string
 from nltk.stem import LancasterStemmer, WordNetLemmatizer
 import enchant
-from enchant.checker import SpellChecker
 from nltk.corpus import stopwords
 import re
 
@@ -38,17 +37,6 @@ def lemmatize(tokens):
 # Function to filter out stop words
 def filter_for_stop_words(tokens, stop_words):
     return [word for word in tokens if word not in stop_words]
-
-# Function to correct spelling errors
-def correct_spelling(text):
-    checker = SpellChecker("en_US")
-    checker.set_text(text)
-    for err in checker:
-        suggestions = err.suggest()
-        if suggestions:
-            err.replace(suggestions[0])
-    corrected_text = checker.get_text()
-    return corrected_text
 
 # Function to preprocess input text
 def preprocess_input(text):
@@ -88,14 +76,6 @@ def extract_num_persons(input_text):
     match = re.search(r'\b(\d+)\b', input_text)
     return int(match.group(1)) if match else 1
 
-# Function to extract exclusion ingredients from the user input
-def extract_exclusions(user_input):
-    exclusion_keywords = ["without", "no"]
-    exclusions = []
 
-    words = user_input.split()
-    for i, word in enumerate(words):
-        if word in exclusion_keywords and i + 1 < len(words):
-            exclusions.append(words[i + 1])
 
-    return exclusions
+

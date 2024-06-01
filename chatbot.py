@@ -1,5 +1,22 @@
 import re
-from text_processing import preprocess_input, contains_yes_or_no, count_matched_tokens, extract_num_persons, extract_exclusions, correct_spelling
+from text_processing import preprocess_input, contains_yes_or_no, count_matched_tokens, extract_num_persons
+from enchant.checker import SpellChecker
+
+# Function to correct spelling errors
+def correct_spelling(text):
+    checker = SpellChecker("en_US")
+    checker.set_text(text)
+    for err in checker:
+        suggestions = err.suggest()
+        if suggestions:
+            err.replace(suggestions[0])
+    corrected_text = checker.get_text()
+    return corrected_text
+
+def extract_exclusions(user_input):
+    exclusion_patterns = re.compile(r"\b(?:without|no|excluded|exclude|omit)\b\s+([a-zA-Z\s]+?)(?:\s|$|,)")
+    exclusions = exclusion_patterns.findall(user_input.lower())
+    return [exclusion.strip() for exclusion in exclusions]
 
 def adjust_recipe_for_persons(recipe, num_persons):
     adjusted_recipe = {}
@@ -23,12 +40,11 @@ def adjust_recipe_for_persons(recipe, num_persons):
             
     return adjusted_recipe
 
-
 def get_matching_recipes(user_input, data_filename):
     user_tokens = preprocess_input(user_input)
     exclusions = extract_exclusions(user_input)
     matching_recipes = []
-    match_scores = {}  
+    match_scores = {}
 
     with open(data_filename, 'r') as file:
         for line in file:
@@ -40,6 +56,13 @@ def get_matching_recipes(user_input, data_filename):
             recipe['Keywords'] = recipe_data[3]
             recipe['Category'] = recipe_data[4]
 
+            # Combine all recipe data into a single string
+            all_recipe_data = ' '.join(recipe_data)
+
+            # Skip recipes that contain excluded ingredients
+            if any(exclusion in all_recipe_data for exclusion in exclusions):
+                continue
+
             match_counter = 0
 
             # Check each column separately for matching tokens
@@ -48,21 +71,19 @@ def get_matching_recipes(user_input, data_filename):
                 if any(user_token in column_tokens for user_token in user_tokens):
                     match_counter += 1
 
-            # Skip recipes that contain excluded ingredients
-            if any(exclusion in preprocess_input(recipe_data[1]) for exclusion in exclusions):
-                continue
+            # Add recipe to matching recipes
+            matching_recipes.append(recipe)
+            match_scores[recipe['DishName']] = match_counter
 
             # Check if user input matches recipe name
             if user_input.lower() in recipe['DishName'].lower():
-                return [recipe]  
-
-            matching_recipes.append(recipe)
-            match_scores[recipe['DishName']] = match_counter
+                return [recipe]
 
     # Sort matching recipes based on match scores
     matching_recipes.sort(key=lambda x: match_scores.get(x['DishName'], 0), reverse=True)
 
-    return matching_recipes or matching_recipes == False
+    return matching_recipes if matching_recipes else False
+
 
 def chat():
     global repeated_recipe
@@ -73,14 +94,14 @@ def chat():
 
     conversation = []
     prev_output = None
-    recommended_recipes = []  
+    recommended_recipes = []
 
     while True:
         user_input = input("You: ").lower()
 
         if user_input == 'exit':
             print("Thank you, enjoy your meal! Goodbye and I hope to see you soon!")
-            break  
+            break
 
         if user_input.strip() == '':
             print("I'm sorry, I couldn't detect any input. Please try again.")
@@ -109,7 +130,7 @@ def chat():
         # Sort matching recipes based on match count
         matching_recipes.sort(key=lambda x: count_matched_tokens(preprocess_input(user_input), preprocess_input(x['Ingredient'])))
         new_matching_recipes = [recipe for recipe in matching_recipes if recipe['DishName'] not in recommended_recipes]
-        
+
         if new_matching_recipes and new_matching_recipes[0]['DishName'] != 'DishName':
             print("Based on your ingredients or categories, here is a recipe recommendation:")
             print(new_matching_recipes[0]['DishName'])
@@ -127,7 +148,7 @@ def chat():
             if not recommended_recipes:
                 print("I'm sorry, there are no recipes matching your criteria. Please try again.")
                 continue  # Start the chat loop again
-                
+
             else:
                 print("I'm sorry, there are no more recipes matching your criteria and previous recommendations.")
                 user_response = input("Do you want to see a previous recipe again or change your criteria? \nYou: ").lower()
@@ -149,7 +170,7 @@ def chat():
                     # Reset conversation and recommended recipes
                     conversation.clear()
                     recommended_recipes.clear()
-                    print("What else can i help you with? ")
+                    print("What else can I help you with? ")
 
     print("Thank you for using the Recipe Finder! Goodbye and have a great day!")
 
