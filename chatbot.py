@@ -140,16 +140,16 @@ def get_matching_recipes(user_input, data_filename):
             recipe['Category'] = recipe_data[4]
 
             match_counter = 0
-            recipe_description = ' '.join(recipe_data[1:4])  # Joining ingredient, step, and keywords
-            recipe_tokens = preprocess_input(recipe_description)
+
+            # Check each column separately for matching tokens
+            for column_data in recipe_data:
+                column_tokens = preprocess_input(column_data)
+                if any(user_token in column_tokens for user_token in user_tokens):
+                    match_counter += 1
 
             # Skip recipes that contain excluded ingredients
-            if any(exclusion in recipe_tokens for exclusion in exclusions):
+            if any(exclusion in preprocess_input(recipe_data[1]) for exclusion in exclusions):
                 continue
-
-            for user_token in user_tokens:
-                if user_token in recipe_tokens:
-                    match_counter += 1
 
             # Check if user input matches recipe name
             if user_input.lower() in recipe['DishName'].lower():
@@ -229,13 +229,9 @@ def chat():
             recommended_recipes.append(new_matching_recipes[0]['DishName'])
         else:
             if not recommended_recipes:
-                user_response = input("I'm sorry, there are no recipes matching your criteria. Would you like to try again or exit? \nYou: ").lower()
-                user_response = correct_spelling(user_response)
-
-                if contains_yes_or_no(user_response) == 'yes':
-                    continue  # Start the chat loop again
-                else:
-                    break  # Exit the chat loop
+                print("I'm sorry, there are no recipes matching your criteria. Please try again.")
+                continue  # Start the chat loop again
+                
             else:
                 print("I'm sorry, there are no more recipes matching your criteria and previous recommendations.")
                 user_response = input("Do you want to see a previous recipe again or change your criteria? \nYou: ").lower()
@@ -257,7 +253,7 @@ def chat():
                     # Reset conversation and recommended recipes
                     conversation.clear()
                     recommended_recipes.clear()
-                    print("You can start a new search now.")
+                    print("What else can i help you with? ")
 
     print("Thank you for using the Recipe Finder! Goodbye and have a great day!")
 
