@@ -1,105 +1,5 @@
-import pandas as pd
-import enchant
 import re
-import nltk
-import string
-from nltk.stem import LancasterStemmer, WordNetLemmatizer
-from enchant.checker import SpellChecker
-from nltk.corpus import stopwords
-
-# Ensure necessary nltk data is downloaded
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
-
-# Initialize stop words
-stop_words = set(stopwords.words('english'))
-
-# Function to preprocess input text
-def preprocess_input(text):
-    tokens = nltk.word_tokenize(text.lower())
-    tokens = [token for token in tokens if token not in string.punctuation]
-    return tokens
-
-def preprocess_input_chat(input_text):
-    tokens = nltk.word_tokenize(input_text)
-
-    tokens_lower = [token.lower() for token in tokens]
-    
-    return tokens_lower
-
-# Function to stem tokens
-def stem(tokens):
-    lancaster = LancasterStemmer()
-    stemmed_tokens = [lancaster.stem(token) for token in tokens]
-    return stemmed_tokens
-
-# Function to lemmatize tokens
-def lemmatize(tokens):
-    lemmatizer = WordNetLemmatizer()
-    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]
-    return lemmatized_tokens
-
-# Function to filter out stop words
-def filter_for_stop_words(tokens, stop_words):
-    return [word for word in tokens if word not in stop_words]
-
-# Function to correct spelling errors
-def correct_spelling(text):
-    checker = SpellChecker("en_US")
-    checker.set_text(text)
-    for err in checker:
-        suggestions = err.suggest()
-        if suggestions:
-            err.replace(suggestions[0])
-    corrected_text = checker.get_text()
-    return corrected_text
-
-
-def contains_yes_or_no(input_text):
-    input_text = input_text.lower()
-    yes_responses = ['yes', 'yah', 'yeah', 'yup', 'yep', 'sure', 'ok', 'okay', 'alright', 'definitely', 'absolutely']
-    no_responses = ['no', 'nah', 'nope', 'not', 'never']
-    
-    if any(word in input_text for word in yes_responses):
-        return 'yes'
-    elif any(word in input_text for word in no_responses):
-        return 'no'
-    else:
-        return None
- 
-
-# Initialize the English dictionary for spell checking
-spell_checker = enchant.Dict("en_US")
-
-stop_words = set(stopwords.words('english'))
-
-# Function to count matched columns from the user input
-def count_matched_tokens(user_tokens, recipe_tokens):
-    set1 = set(user_tokens)
-    set2 = set(recipe_tokens)
-
-    total_matches = len(set1.intersection(set2))
-
-    return total_matches
-
-# Function to extract exclusion ingredients from the user input
-def extract_exclusions(user_input):
-    exclusion_keywords = ["without", "no"]
-    exclusions = []
-
-    words = user_input.split()
-    for i, word in enumerate(words):
-        if word in exclusion_keywords and i + 1 < len(words):
-            exclusions.append(words[i + 1])
-
-    return exclusions
-
-def evaluate_accuracy(correct_recipes, recommended_recipes):
-    correct_count = sum(recipe in correct_recipes for recipe in recommended_recipes)
-    total_recommended = len(recommended_recipes)
-    incorrect_count = total_recommended - correct_count
-    return correct_count, total_recommended, incorrect_count
+from text_processing import preprocess_input, contains_yes_or_no, count_matched_tokens, extract_num_persons, extract_exclusions, correct_spelling
 
 def adjust_recipe_for_persons(recipe, num_persons):
     adjusted_recipe = {}
@@ -123,11 +23,12 @@ def adjust_recipe_for_persons(recipe, num_persons):
             
     return adjusted_recipe
 
+
 def get_matching_recipes(user_input, data_filename):
     user_tokens = preprocess_input(user_input)
     exclusions = extract_exclusions(user_input)
     matching_recipes = []
-    match_scores = {}  # Dictionary to store match scores for each recipe
+    match_scores = {}  
 
     with open(data_filename, 'r') as file:
         for line in file:
@@ -162,11 +63,6 @@ def get_matching_recipes(user_input, data_filename):
     matching_recipes.sort(key=lambda x: match_scores.get(x['DishName'], 0), reverse=True)
 
     return matching_recipes or matching_recipes == False
-
-
-def extract_num_persons(input_text):
-    match = re.search(r'\b(\d+)\b', input_text)
-    return int(match.group(1)) if match else 1
 
 def chat():
     global repeated_recipe
