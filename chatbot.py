@@ -93,8 +93,6 @@ def correct_spelling(text):
     corrected_text = checker.get_text()
     return corrected_text
 
-import re
-
 def chat():
     print("Hello, I hope you are doing well! Welcome to your personal Recipe Finder!")
     print("You can tell me which ingredients or categories you have, and I can provide you with recipes based on those.")
