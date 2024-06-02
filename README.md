@@ -21,10 +21,10 @@ pip install pandas
 
 ```python
 import pandas as pd
-import string
 import nltk
-from nltk.corpus import stopwords
-from nltk.stem import LancasterStemmer, WordNetLemmatizer
+import string
+import enchant
+import re
 ```
 
 ### Download NLTK data
