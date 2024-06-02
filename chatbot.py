@@ -93,6 +93,7 @@ def correct_spelling(text):
     corrected_text = checker.get_text()
     return corrected_text
 
+import re
 
 def chat():
     print("Hello, I hope you are doing well! Welcome to your personal Recipe Finder!")
@@ -121,28 +122,56 @@ def chat():
             print("DishDive:", end=" ")
 
         # Extract positive and negative ingredients from user input
-        positive_ingredients = re.findall(r'\b((?!no|without|don\'t\slike)\w+)\b', user_input)
-        negative_ingredients = re.findall(r"\b(?:no|without|don't\slike)\s(\w+)\b", user_input)
+        positive_ingredients = re.findall(r'\b(?:with|contains|want|love|wish?)\s(\w+)\b', user_input)
+        negative_ingredients = re.findall(r"\b(?:no|without|don't\slike|dislike)\s(\w+)\b", user_input)
+
+        # Handle simple ingredient inputs
+        if not positive_ingredients and not negative_ingredients:
+            if 'with' in user_input:
+                ingredient = user_input.split('with')[-1].strip()
+                if ingredient in negative_list:
+                    negative_list.remove(ingredient)
+                positive_list.append(ingredient)
+            elif 'no' in user_input:
+                ingredient = user_input.split('no')[-1].strip()
+                if ingredient in positive_list:
+                    positive_list.remove(ingredient)
+                negative_list.append(ingredient)
+            else:
+                # Handle simple single ingredient input
+                if ' and ' in user_input:
+                    positive_ingredients = user_input.split(' and ')
+                else:
+                    positive_ingredients = [user_input]
+        else:
+            # Remove ingredients specified as negative from the positive list
+            for ingredient in positive_ingredients:
+                if ingredient in negative_list:
+                    negative_list.remove(ingredient)
+            # Remove ingredients specified as positive from the negative list
+            for ingredient in negative_ingredients:
+                if ingredient in positive_list:
+                    positive_list.remove(ingredient)
 
         # Update positive and negative lists
         positive_list.extend(positive_ingredients)
         negative_list.extend(negative_ingredients)
 
-        # Remove duplicates from positive and negative lists
+        # Remove duplicates from lists
         positive_list = list(set(positive_list))
         negative_list = list(set(negative_list))
 
         # Try to find matching recipes if there's enough valid input
-        if positive_list:
+        if positive_list or negative_list:
             try:
-                matching_recipes = get_matching_recipes(user_input, ' '.join(positive_list), negative_list, 'csv/recipe.csv')
+                matching_recipes = get_matching_recipes(user_input, positive_list, negative_list, 'csv/recipe.csv')
             except ValueError as e:
                 if matching_recipes:
                     print(e)
                 continue
 
             if not matching_recipes:
-                print("I'm sorry, I couldn't find any recipes matching your ingredients or categories. Please try again. Thank you.")
+                print("I'm sorry, I couldn't find any recipes matching your ingredients or categories.")
                 continue
 
             # Filter out already recommended recipes
@@ -191,6 +220,8 @@ def chat():
 
     print("\nThank you for using the Recipe Finder! Goodbye and have a great day!")
     print("Conversation log:", conversation)
+    print("Positiv log:", positive_list)
+    print("Negativ log:", negative_list)
     print("Recommended recipes log:", recommended_recipes)
 
 chat()
