@@ -10,19 +10,15 @@ nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Initialize stop words
 stop_words = set(stopwords.words('english'))
 
-# Initialize the English dictionary for spell checking
 spell_checker = enchant.Dict("en_US")
 
-# Function to stem tokens
 def stem(tokens):
     lancaster = LancasterStemmer()
     stemmed_tokens = [lancaster.stem(token) for token in tokens]
     return stemmed_tokens
 
-# Function to lemmatize tokens
 def lemmatize(tokens):
     lemmatizer = WordNetLemmatizer()
     lemmatized_tokens = []
@@ -38,9 +34,7 @@ def preprocess_input(text):
     tokens = nltk.word_tokenize(text.lower())
     tokens = [token for token in tokens if token not in string.punctuation]
     tokens = [token for token in tokens if token not in stop_words]
-    # Lemmatize tokens
     tokens = lemmatize(tokens)
-    # Stem tokens
     tokens = stem(tokens)
     return tokens
 
@@ -57,7 +51,6 @@ def contains_yes_or_no(input_text):
     else:
         return None
 
-# Function to count matched columns from the user input
 def count_matched_tokens(user_tokens, recipe_tokens):
     set1 = set(user_tokens)
     set2 = set(recipe_tokens)

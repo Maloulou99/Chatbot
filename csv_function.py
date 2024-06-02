@@ -17,7 +17,6 @@ def add_keywords_by_category():
 
     category_keywords = {}
 
-    # Building the category_keywords dictionary
     for index, row in categories_df.iterrows():
         category = row['Category']
         keywords = preprocess_input(row['Keywords'])
@@ -54,7 +53,6 @@ def add_keywords_by_category():
         print(" ----------------------------------")
 
 
-    # Adding additional keywords from the keywords file
     for index, row in keywords_df.iterrows():
         dish_name = row['DishName']
         additional_keywords = preprocess_input(row['Keywords'])
@@ -65,20 +63,16 @@ def add_keywords_by_category():
         matching_row = recipes_df[recipes_df['DishName'] == dish_name]
 
         if not matching_row.empty:
-            # Getting current keywords and categories
             current_keywords = set(matching_row['Keywords'].iloc[0].split())
             current_categories = set(matching_row['Category'].iloc[0].split(', '))
 
-            # Adding new keywords
             current_keywords.update(combined_additional_keywords)
 
-            # Adding matching categories based on additional keywords
             for keyword in combined_additional_keywords:
                 for category, keywords_list in category_keywords.items():
                     if keyword in keywords_list:
                         current_categories.add(category)
 
-            # Updating the DataFrame
             updated_keywords = ' '.join(current_keywords)
             updated_categories = ', '.join(filter(None, current_categories))
             recipes_df.at[matching_row.index[0], 'Keywords'] = updated_keywords
@@ -87,7 +81,6 @@ def add_keywords_by_category():
             print(f"(3) Dish: {dish_name}, Additional Keywords: {additional_keywords}, Categories: {current_categories}\n")
             print(" ----------------------------------")
 
-    # Save the updated recipes DataFrame back to the CSV
     recipes_df.to_csv(recipes_file, index=False)
 
     return recipes_df
